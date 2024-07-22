@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { mat4 } from 'gl-matrix';
 
 function Home() {
   useEffect(() => {
@@ -15,8 +16,9 @@ function Home() {
 
     const vertexShaderSource = `
       attribute vec4 a_position;
+      uniform mat4 u_matrix;
       void main() {
-        gl_Position = a_position;
+        gl_Position = u_matrix * a_position;
       }
     `;
 
@@ -103,6 +105,7 @@ function Home() {
     const positionLocation = gl.getAttribLocation(program, 'a_position');
     const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
     const timeLocation = gl.getUniformLocation(program, 'u_time');
+    const matrixLocation = gl.getUniformLocation(program, 'u_matrix');
 
     if (positionLocation === -1) {
       console.error('Unable to get attribute location for a_position');
@@ -128,8 +131,14 @@ function Home() {
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform1f(timeLocation, time);
 
-      // Clear the canvas
+      // Clear the canvas with a specific color
+      gl.clearColor(0.0, 0.0, 0.0, 1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);
+
+      // Create a transformation matrix
+      const matrix = mat4.create();
+      mat4.ortho(matrix, -1, 1, -1, 1, -1, 1);
+      gl.uniformMatrix4fv(matrixLocation, false, matrix);
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
       requestAnimationFrame(render);
@@ -137,7 +146,18 @@ function Home() {
 
     requestAnimationFrame(render);
 
+    // Handle window resize events
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
     return () => {
+      window.removeEventListener('resize', resizeCanvas);
       document.body.removeChild(canvas);
     };
   }, []);
