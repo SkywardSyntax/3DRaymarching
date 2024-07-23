@@ -28,9 +28,21 @@ function Home() {
       uniform vec2 u_resolution;
       uniform float u_time;
       uniform float u_zoom;
+      uniform vec3 u_lightPos;
 
       float sphere(vec3 p) {
         return length(p) - 1.0;
+      }
+
+      float calculateShadow(vec3 ro, vec3 rd) {
+        float t = 0.01;
+        for (int i = 0; i < 50; i++) {
+          vec3 p = ro + t * rd;
+          float d = sphere(p);
+          if (d < 0.001) return 0.0;
+          t += d;
+        }
+        return 1.0;
       }
 
       float rayMarching(vec3 ro, vec3 rd) {
@@ -54,7 +66,11 @@ function Home() {
 
         float t = rayMarching(ro, rd);
         vec3 pos = ro + t * rd;
-        vec3 color = vec3(1.0 - t / 10.0, 0.5 * sin(u_time + t), 1.0);
+
+        vec3 lightDir = normalize(u_lightPos - pos);
+        float shadow = calculateShadow(pos + lightDir * 0.01, lightDir);
+
+        vec3 color = vec3(1.0 - t / 10.0, 0.5 * sin(u_time + t), 1.0) * shadow;
 
         gl_FragColor = vec4(color, 1.0);
       }
@@ -94,6 +110,7 @@ function Home() {
     const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
     const timeLocation = gl.getUniformLocation(program, 'u_time');
     const zoomLocation = gl.getUniformLocation(program, 'u_zoom');
+    const lightPosLocation = gl.getUniformLocation(program, 'u_lightPos');
 
     if (positionLocation === -1) {
       console.error('Unable to get attribute location for a_position');
@@ -119,6 +136,7 @@ function Home() {
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform1f(timeLocation, time);
       gl.uniform1f(zoomLocation, zoom);
+      gl.uniform3f(lightPosLocation, 2.0, 2.0, 2.0);
 
       // Clear the canvas with a specific color
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
