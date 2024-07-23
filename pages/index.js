@@ -9,6 +9,7 @@ function Home() {
   const [lastMouseX, setLastMouseX] = useState(0);
   const [lastMouseY, setLastMouseY] = useState(0);
   const [lightPos, setLightPos] = useState([2.0, 2.0, 2.0]);
+  const [roughness, setRoughness] = useState(0.1);
 
   useEffect(() => {
     const canvas = document.createElement('canvas');
@@ -42,6 +43,7 @@ function Home() {
       uniform float u_zoom;
       uniform vec3 u_lightPos;
       uniform mat4 u_rotation;
+      uniform float u_roughness;
 
       float hash(vec3 p) {
         return fract(sin(dot(p, vec3(12.9898, 78.233, 45.164))) * 43758.5453);
@@ -58,7 +60,7 @@ function Home() {
       }
 
       float sphere(vec3 p) {
-        return length(p) - 1.0 + 0.1 * noise(p * 10.0);
+        return length(p) - 1.0 + u_roughness * noise(p * 10.0);
       }
 
       float calculateShadow(vec3 ro, vec3 rd) {
@@ -195,6 +197,7 @@ function Home() {
     const zoomLocation = gl.getUniformLocation(program, 'u_zoom');
     const lightPosLocation = gl.getUniformLocation(program, 'u_lightPos');
     const rotationLocation = gl.getUniformLocation(program, 'u_rotation');
+    const roughnessLocation = gl.getUniformLocation(program, 'u_roughness');
 
     if (positionLocation === -1) {
       console.error('Unable to get attribute location for a_position');
@@ -243,6 +246,7 @@ function Home() {
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform1f(timeLocation, time);
       gl.uniform1f(zoomLocation, zoom);
+      gl.uniform1f(roughnessLocation, roughness);
 
       // Update light source position
       const lightX = 2.0 * Math.cos(time);
@@ -305,54 +309,33 @@ function Home() {
     window.addEventListener('touchstart', handleTouchStart);
     window.addEventListener('touchmove', handleTouchMove);
 
-    // Remove mouse events for rotation
-    // function handleMouseDown(event) {
-    //   setIsDragging(true);
-    //   setLastMouseX(event.clientX);
-    //   setLastMouseY(event.clientY);
-    // }
+    // Handle arrow key events for roughness and rotation
+    function handleKeyDown(event) {
+      if (event.key === 'ArrowUp') {
+        setRoughness((prev) => Math.min(prev + 0.01, 1.0));
+      } else if (event.key === 'ArrowDown') {
+        setRoughness((prev) => Math.max(prev - 0.01, 0.0));
+      } else if (event.key === 'ArrowLeft') {
+        setRotationY((prev) => prev - 0.1);
+      } else if (event.key === 'ArrowRight') {
+        setRotationY((prev) => prev + 0.1);
+      }
+    }
 
-    // function handleMouseMove(event) {
-    //   if (isDragging) {
-    //     const deltaX = event.clientX - lastMouseX;
-    //     const deltaY = event.clientY - lastMouseY;
-    //     setRotationX(rotationX + deltaY * 0.01);
-    //     setRotationY(rotationY + deltaX * 0.01);
-    //     setLastMouseX(event.clientX);
-    //     setLastMouseY(event.clientY);
-    //   }
-    // }
-
-    // function handleMouseUp() {
-    //   setIsDragging(false);
-    // }
-
-    // window.addEventListener('mousedown', handleMouseDown);
-    // window.addEventListener('mousemove', handleMouseMove);
-    // window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
-      // window.removeEventListener('mousedown', handleMouseDown);
-      // window.removeEventListener('mousemove', handleMouseMove);
-      // window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('keydown', handleKeyDown);
       document.body.removeChild(canvasContainer);
     };
-  }, [zoom, rotationX, rotationY]);
+  }, [zoom, rotationX, rotationY, roughness]);
 
   return (
     <div className="frosted-glass-chip">
-      <input
-        type="range"
-        min={-Math.PI}
-        max={Math.PI}
-        step={0.01}
-        value={rotationY}
-        onChange={(e) => setRotationY(parseFloat(e.target.value))}
-        className="slider"
-      />
+      {/* Removed rotation slider input */}
     </div>
   );
 }

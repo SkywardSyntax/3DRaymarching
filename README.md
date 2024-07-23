@@ -32,9 +32,9 @@ This project now includes a visible indicator for the location of the light sour
 
 Additionally, the shadow rendering algorithm has been improved to use a more sophisticated approach, combining soft shadows and ambient occlusion for more realistic results.
 
-## Horizontal Rotation Control
+## Roughness and Rotation Control
 
-You can now rotate the rough sphere horizontally using a slider on a frosted glass chip. The slider is located at the bottom of the screen. Adjust the slider to rotate the sphere without deforming it.
+You can now modify the magnitude of the roughness of the sphere using the up and down arrow keys. The left and right arrow keys rotate the sphere horizontally.
 
 ## Dynamic Light Source Movement
 
