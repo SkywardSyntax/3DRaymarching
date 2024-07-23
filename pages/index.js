@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { mat4, vec3 } from 'gl-matrix';
+import debounce from 'lodash.debounce';
 
 function Home() {
   const [zoom, setZoom] = useState(1.0);
@@ -10,6 +11,8 @@ function Home() {
   const [lastMouseY, setLastMouseY] = useState(0);
   const [lightPos, setLightPos] = useState([2.0, 2.0, 2.0]);
   const [roughness, setRoughness] = useState(0.1);
+
+  const debouncedSetRoughness = debounce(setRoughness, 100);
 
   useEffect(() => {
     const canvas = document.createElement('canvas');
@@ -312,9 +315,9 @@ function Home() {
     // Handle arrow key events for roughness and rotation
     function handleKeyDown(event) {
       if (event.key === 'ArrowUp') {
-        setRoughness((prev) => Math.min(prev + 0.01, 1.0));
+        debouncedSetRoughness((prev) => Math.min(prev + 0.01, 1.0));
       } else if (event.key === 'ArrowDown') {
-        setRoughness((prev) => Math.max(prev - 0.01, 0.0));
+        debouncedSetRoughness((prev) => Math.max(prev - 0.01, 0.0));
       } else if (event.key === 'ArrowLeft') {
         setRotationY((prev) => prev - 0.1);
       } else if (event.key === 'ArrowRight') {
