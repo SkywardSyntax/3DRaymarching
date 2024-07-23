@@ -29,8 +29,16 @@ function Home() {
       uniform float u_time;
       uniform float u_zoom;
 
-      float sphere(vec3 p, float r) {
-        return length(p) - r;
+      bool sphere(vec3 ro, vec3 rd, float r, out float t0, out float t1) {
+        vec3 oc = ro;
+        float b = dot(oc, rd);
+        float c = dot(oc, oc) - r * r;
+        float h = b * b - c;
+        if (h < 0.0) return false;
+        h = sqrt(h);
+        t0 = -b - h;
+        t1 = -b + h;
+        return true;
       }
 
       void main() {
@@ -41,27 +49,12 @@ function Home() {
         vec3 ro = vec3(0.0, 0.0, 5.0 / u_zoom); // Ray origin
         vec3 rd = normalize(vec3(uv, -1.0)); // Ray direction
 
-        float totalDistance = 0.0; // Total distance traveled by the ray
-        float minDistance = 0.001; // Minimum distance to consider as hitting the surface
-        float maxDistance = 100.0; // Maximum distance before giving up
-        const int maxSteps = 64; // Maximum number of steps
-
-        for (int i = 0; i < maxSteps; i++) {
-          vec3 pos = ro + totalDistance * rd;
-          float dist = sphere(pos, 1.0);
-          if (dist < minDistance) {
-            break;
-          }
-          totalDistance += dist;
-          if (totalDistance > maxDistance) {
-            totalDistance = maxDistance;
-            break;
-          }
-        }
-
+        float t0, t1;
         vec3 color = vec3(0.0);
-        if (totalDistance < maxDistance) {
-          color = vec3(1.0 - totalDistance / 10.0, 0.5 * sin(u_time + totalDistance), 1.0);
+        if (sphere(ro, rd, 1.0, t0, t1)) {
+          float t = (t0 < 0.0) ? t1 : t0;
+          vec3 pos = ro + t * rd;
+          color = vec3(1.0 - t / 10.0, 0.5 * sin(u_time + t), 1.0);
         }
         gl_FragColor = vec4(color, 1.0);
       }

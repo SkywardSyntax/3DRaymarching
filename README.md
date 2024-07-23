@@ -1,10 +1,10 @@
-# Raymarching Fractal Demo with WebGL
+# Raytracing Fractal Demo with WebGL
 
-Welcome to the raymarching fractal demo implemented with WebGL! This project showcases a fractal rendered using raymarching techniques in a WebGL context.
+Welcome to the raytracing fractal demo implemented with WebGL! This project showcases a fractal rendered using raytracing techniques in a WebGL context.
 
 ## Description
 
-This project demonstrates a raymarching fractal demo using WebGL. The fractal is rendered in real-time on a canvas element, providing an interactive and visually appealing experience.
+This project demonstrates a raytracing fractal demo using WebGL. The fractal is rendered in real-time on a canvas element, providing an interactive and visually appealing experience.
 
 ## Running the Application
 
