@@ -140,16 +140,38 @@ function Home() {
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Handle zoom events
-    function handleWheel(event) {
-      setZoom(prevZoom => Math.max(0.1, prevZoom + event.deltaY * -0.01));
+    // Handle pinch-to-zoom events
+    let initialPinchDistance = null;
+    let lastZoom = zoom;
+
+    function handleTouchStart(event) {
+      if (event.touches.length === 2) {
+        initialPinchDistance = Math.hypot(
+          event.touches[0].clientX - event.touches[1].clientX,
+          event.touches[0].clientY - event.touches[1].clientY
+        );
+        lastZoom = zoom;
+      }
     }
 
-    window.addEventListener('wheel', handleWheel);
+    function handleTouchMove(event) {
+      if (event.touches.length === 2 && initialPinchDistance !== null) {
+        const currentPinchDistance = Math.hypot(
+          event.touches[0].clientX - event.touches[1].clientX,
+          event.touches[0].clientY - event.touches[1].clientY
+        );
+        const pinchRatio = currentPinchDistance / initialPinchDistance;
+        setZoom(Math.max(0.1, lastZoom * pinchRatio));
+      }
+    }
+
+    window.addEventListener('touchstart', handleTouchStart);
+    window.addEventListener('touchmove', handleTouchMove);
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
-      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
       document.body.removeChild(canvas);
     };
   }, [zoom]);
