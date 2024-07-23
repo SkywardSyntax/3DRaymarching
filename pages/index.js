@@ -29,16 +29,19 @@ function Home() {
       uniform float u_time;
       uniform float u_zoom;
 
-      bool sphere(vec3 ro, vec3 rd, float r, out float t0, out float t1) {
-        vec3 oc = ro;
-        float b = dot(oc, rd);
-        float c = dot(oc, oc) - r * r;
-        float h = b * b - c;
-        if (h < 0.0) return false;
-        h = sqrt(h);
-        t0 = -b - h;
-        t1 = -b + h;
-        return true;
+      float sphere(vec3 p) {
+        return length(p) - 1.0;
+      }
+
+      float rayMarching(vec3 ro, vec3 rd) {
+        float t = 0.0;
+        for (int i = 0; i < 100; i++) {
+          vec3 p = ro + t * rd;
+          float d = sphere(p);
+          if (d < 0.001) break;
+          t += d;
+        }
+        return t;
       }
 
       void main() {
@@ -49,13 +52,10 @@ function Home() {
         vec3 ro = vec3(0.0, 0.0, 5.0 / u_zoom); // Ray origin
         vec3 rd = normalize(vec3(uv, -1.0)); // Ray direction
 
-        float t0, t1;
-        vec3 color = vec3(0.0);
-        if (sphere(ro, rd, 1.0, t0, t1)) {
-          float t = (t0 < 0.0) ? t1 : t0;
-          vec3 pos = ro + t * rd;
-          color = vec3(1.0 - t / 10.0, 0.5 * sin(u_time + t), 1.0);
-        }
+        float t = rayMarching(ro, rd);
+        vec3 pos = ro + t * rd;
+        vec3 color = vec3(1.0 - t / 10.0, 0.5 * sin(u_time + t), 1.0);
+
         gl_FragColor = vec4(color, 1.0);
       }
     `;
