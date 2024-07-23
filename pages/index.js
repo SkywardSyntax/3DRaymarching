@@ -35,14 +35,19 @@ function Home() {
       }
 
       float calculateShadow(vec3 ro, vec3 rd) {
+        float res = 1.0;
         float t = 0.01;
         for (int i = 0; i < 50; i++) {
           vec3 p = ro + t * rd;
           float d = sphere(p);
-          if (d < 0.001) return 0.0;
+          if (d < 0.001) {
+            res = 0.0;
+            break;
+          }
+          res = min(res, 10.0 * d / t);
           t += d;
         }
-        return 1.0;
+        return res;
       }
 
       float rayMarching(vec3 ro, vec3 rd) {
@@ -54,6 +59,13 @@ function Home() {
           t += d;
         }
         return t;
+      }
+
+      void renderLightSource(vec3 lightPos) {
+        float d = sphere(lightPos);
+        if (d < 0.001) {
+          gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0); // Yellow color for light source
+        }
       }
 
       void main() {
@@ -73,6 +85,9 @@ function Home() {
         vec3 color = vec3(1.0 - t / 10.0, 0.5 * sin(u_time + t), 1.0) * shadow;
 
         gl_FragColor = vec4(color, 1.0);
+
+        // Render the light source indicator
+        renderLightSource(u_lightPos);
       }
     `;
 
