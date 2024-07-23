@@ -12,6 +12,9 @@ function Home() {
   useEffect(() => {
     const canvas = document.createElement('canvas');
     document.body.appendChild(canvas);
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
