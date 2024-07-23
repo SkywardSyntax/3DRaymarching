@@ -66,7 +66,7 @@ function Home() {
       float calculateShadow(vec3 ro, vec3 rd) {
         float res = 1.0;
         float t = 0.01;
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 25; i++) {
           vec3 p = ro + t * rd;
           float d = sphere(p);
           if (d < 0.001) {
@@ -82,7 +82,7 @@ function Home() {
       float softShadow(vec3 ro, vec3 rd) {
         float res = 1.0;
         float t = 0.01;
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 25; i++) {
           vec3 p = ro + t * rd;
           float d = sphere(p);
           if (d < 0.001) {
@@ -108,7 +108,7 @@ function Home() {
 
       float rayMarching(vec3 ro, vec3 rd, vec3 lightPos) {
         float t = 0.0;
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 50; i++) {
           vec3 p = ro + t * rd;
           float d = sphere(p);
           if (d < 0.001) break;
