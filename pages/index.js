@@ -48,6 +48,18 @@ function Home() {
       uniform mat4 u_rotation;
       uniform float u_roughness;
 
+      struct Material {
+        vec3 ambient;
+        vec3 diffuse;
+        vec3 specular;
+        float shininess;
+      };
+
+      struct Light {
+        vec3 position;
+        vec3 color;
+      };
+
       float hash(vec3 p) {
         return fract(sin(dot(p, vec3(12.9898, 78.233, 45.164))) * 43758.5453);
       }
@@ -120,6 +132,17 @@ function Home() {
         return t;
       }
 
+      vec3 phongShading(vec3 pos, vec3 normal, vec3 viewDir, Light light, Material material) {
+        vec3 lightDir = normalize(light.position - pos);
+        float diff = max(dot(normal, lightDir), 0.0);
+        vec3 reflectDir = reflect(-lightDir, normal);
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+        vec3 ambient = material.ambient * light.color;
+        vec3 diffuse = material.diffuse * diff * light.color;
+        vec3 specular = material.specular * spec * light.color;
+        return ambient + diffuse + specular;
+      }
+
       void renderLightSource(vec3 lightPos) {
         float d = sphere(lightPos);
         if (d < 0.001) {
@@ -155,7 +178,12 @@ function Home() {
         float shadow = softShadow(pos + lightDir * 0.01, lightDir);
         float ao = ambientOcclusion(pos, lightDir);
 
-        vec3 color = vec3(1.0, 0.0, 0.0) * shadow * ao;
+        vec3 normal = normalize(pos);
+        vec3 viewDir = normalize(-pos);
+        Material material = Material(vec3(0.1), vec3(0.6), vec3(0.3), 32.0);
+        Light light = Light(u_lightPos, vec3(1.0));
+
+        vec3 color = phongShading(pos, normal, viewDir, light, material) * shadow * ao;
 
         gl_FragColor = vec4(color, 1.0);
 
