@@ -16,9 +16,8 @@ function Home() {
 
     const vertexShaderSource = `
       attribute vec4 a_position;
-      uniform mat4 u_matrix;
       void main() {
-        gl_Position = u_matrix * a_position;
+        gl_Position = a_position;
       }
     `;
 
@@ -27,17 +26,8 @@ function Home() {
       uniform vec2 u_resolution;
       uniform float u_time;
 
-      float fractal(vec3 p) {
-        float scale = 1.0;
-        float dist = 0.0;
-        int i = 0;
-        while (i < 8) {
-          p.xy = abs(p.xy) / dot(p.xy, p.xy) - 1.0;
-          dist += length(p) * scale;
-          scale *= 0.5;
-          i++;
-        }
-        return dist;
+      float sphere(vec3 p, float r) {
+        return length(p) - r;
       }
 
       void main() {
@@ -55,7 +45,7 @@ function Home() {
 
         for (int i = 0; i < maxSteps; i++) {
           vec3 pos = ro + totalDistance * rd;
-          float dist = fractal(pos);
+          float dist = sphere(pos, 1.0);
           if (dist < minDistance) {
             break;
           }
@@ -107,7 +97,6 @@ function Home() {
     const positionLocation = gl.getAttribLocation(program, 'a_position');
     const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
     const timeLocation = gl.getUniformLocation(program, 'u_time');
-    const matrixLocation = gl.getUniformLocation(program, 'u_matrix');
 
     if (positionLocation === -1) {
       console.error('Unable to get attribute location for a_position');
@@ -136,11 +125,6 @@ function Home() {
       // Clear the canvas with a specific color
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);
-
-      // Create a transformation matrix
-      const matrix = mat4.create();
-      mat4.ortho(matrix, -1, 1, -1, 1, -1, 1);
-      gl.uniformMatrix4fv(matrixLocation, false, matrix);
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
       requestAnimationFrame(render);
