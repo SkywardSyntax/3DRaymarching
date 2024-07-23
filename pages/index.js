@@ -119,7 +119,7 @@ function Home() {
         float shadow = softShadow(pos + lightDir * 0.01, lightDir);
         float ao = ambientOcclusion(pos, lightDir);
 
-        vec3 color = vec3(1.0 - t / 10.0, 0.5 * sin(u_time + t), 1.0) * shadow * ao;
+        vec3 color = vec3(1.0, 0.0, 0.0) * shadow * ao;
 
         gl_FragColor = vec4(color, 1.0);
 
