@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { mat4 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 
 function Home() {
   const [zoom, setZoom] = useState(1.0);
@@ -122,6 +122,12 @@ function Home() {
         }
       }
 
+      bool isInFrustum(vec3 p) {
+        vec4 clipSpacePos = u_rotation * vec4(p, 1.0);
+        vec3 ndcPos = clipSpacePos.xyz / clipSpacePos.w;
+        return all(lessThanEqual(abs(ndcPos), vec3(1.0)));
+      }
+
       void main() {
         vec2 uv = gl_FragCoord.xy / u_resolution;
         uv = (uv - 0.5) * 2.0; // Map UV to range [-1, 1]
@@ -135,6 +141,10 @@ function Home() {
 
         float t = rayMarching(ro, rd, u_lightPos);
         vec3 pos = ro + t * rd;
+
+        if (!isInFrustum(pos)) {
+          discard;
+        }
 
         vec3 lightDir = normalize(u_lightPos - pos);
         float shadow = softShadow(pos + lightDir * 0.01, lightDir);
