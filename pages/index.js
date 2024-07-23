@@ -215,6 +215,29 @@ function Home() {
     gl.enableVertexAttribArray(positionLocation);
     gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
+    const sphereCache = new Map();
+    const noiseCache = new Map();
+
+    function cachedSphere(p) {
+      const key = `${p[0]},${p[1]},${p[2]}`;
+      if (sphereCache.has(key)) {
+        return sphereCache.get(key);
+      }
+      const result = sphere(p);
+      sphereCache.set(key, result);
+      return result;
+    }
+
+    function cachedNoise(p) {
+      const key = `${p[0]},${p[1]},${p[2]}`;
+      if (noiseCache.has(key)) {
+        return noiseCache.get(key);
+      }
+      const result = noise(p);
+      noiseCache.set(key, result);
+      return result;
+    }
+
     function render(time) {
       time *= 0.001; // convert to seconds
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
