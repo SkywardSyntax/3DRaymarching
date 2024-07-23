@@ -8,10 +8,14 @@ function Home() {
   const [isDragging, setIsDragging] = useState(false);
   const [lastMouseX, setLastMouseX] = useState(0);
   const [lastMouseY, setLastMouseY] = useState(0);
+  const [lightPos, setLightPos] = useState([2.0, 2.0, 2.0]);
 
   useEffect(() => {
     const canvas = document.createElement('canvas');
-    document.body.appendChild(canvas);
+    const canvasContainer = document.createElement('div');
+    canvasContainer.className = 'canvas-container';
+    document.body.appendChild(canvasContainer);
+    canvasContainer.appendChild(canvas);
     canvas.style.position = 'fixed';
     canvas.style.top = '0';
     canvas.style.left = '0';
@@ -100,7 +104,7 @@ function Home() {
         return 1.0 - occlusion;
       }
 
-      float rayMarching(vec3 ro, vec3 rd) {
+      float rayMarching(vec3 ro, vec3 rd, vec3 lightPos) {
         float t = 0.0;
         for (int i = 0; i < 100; i++) {
           vec3 p = ro + t * rd;
@@ -129,7 +133,7 @@ function Home() {
         // Apply rotation to ray direction
         rd = (u_rotation * vec4(rd, 0.0)).xyz;
 
-        float t = rayMarching(ro, rd);
+        float t = rayMarching(ro, rd, u_lightPos);
         vec3 pos = ro + t * rd;
 
         vec3 lightDir = normalize(u_lightPos - pos);
@@ -206,7 +210,13 @@ function Home() {
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform1f(timeLocation, time);
       gl.uniform1f(zoomLocation, zoom);
-      gl.uniform3f(lightPosLocation, 2.0, 2.0, 2.0);
+
+      // Update light source position
+      const lightX = 2.0 * Math.cos(time);
+      const lightY = 2.0 * Math.sin(time);
+      const lightZ = 2.0;
+      setLightPos([lightX, lightY, lightZ]);
+      gl.uniform3f(lightPosLocation, lightX, lightY, lightZ);
 
       // Create rotation matrix
       const rotationMatrix = mat4.create();
@@ -295,7 +305,7 @@ function Home() {
       // window.removeEventListener('mousedown', handleMouseDown);
       // window.removeEventListener('mousemove', handleMouseMove);
       // window.removeEventListener('mouseup', handleMouseUp);
-      document.body.removeChild(canvas);
+      document.body.removeChild(canvasContainer);
     };
   }, [zoom, rotationX, rotationY]);
 

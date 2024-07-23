@@ -35,3 +35,7 @@ Additionally, the shadow rendering algorithm has been improved to use a more sop
 ## Horizontal Rotation Control
 
 You can now rotate the rough sphere horizontally using a slider on a frosted glass chip. The slider is located at the bottom of the screen. Adjust the slider to rotate the sphere without deforming it.
+
+## Dynamic Light Source Movement
+
+The light source now moves around the sphere, and the sphere's lighting updates live. The light source position changes dynamically over time, creating a more interactive and visually appealing experience.
