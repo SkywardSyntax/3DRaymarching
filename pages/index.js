@@ -1,7 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { mat4 } from 'gl-matrix';
 
 function Home() {
+  const [zoom, setZoom] = useState(1.0);
+
   useEffect(() => {
     const canvas = document.createElement('canvas');
     document.body.appendChild(canvas);
@@ -25,6 +27,7 @@ function Home() {
       precision highp float;
       uniform vec2 u_resolution;
       uniform float u_time;
+      uniform float u_zoom;
 
       float sphere(vec3 p, float r) {
         return length(p) - r;
@@ -35,7 +38,7 @@ function Home() {
         uv = (uv - 0.5) * 2.0; // Map UV to range [-1, 1]
         uv.x *= u_resolution.x / u_resolution.y; // Maintain aspect ratio
 
-        vec3 ro = vec3(0.0, 0.0, 5.0); // Ray origin
+        vec3 ro = vec3(0.0, 0.0, 5.0 / u_zoom); // Ray origin
         vec3 rd = normalize(vec3(uv, -1.0)); // Ray direction
 
         float totalDistance = 0.0; // Total distance traveled by the ray
@@ -97,6 +100,7 @@ function Home() {
     const positionLocation = gl.getAttribLocation(program, 'a_position');
     const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
     const timeLocation = gl.getUniformLocation(program, 'u_time');
+    const zoomLocation = gl.getUniformLocation(program, 'u_zoom');
 
     if (positionLocation === -1) {
       console.error('Unable to get attribute location for a_position');
@@ -121,6 +125,7 @@ function Home() {
       time *= 0.001; // convert to seconds
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform1f(timeLocation, time);
+      gl.uniform1f(zoomLocation, zoom);
 
       // Clear the canvas with a specific color
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -142,11 +147,19 @@ function Home() {
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
+    // Handle zoom events
+    function handleWheel(event) {
+      setZoom(prevZoom => Math.max(0.1, prevZoom + event.deltaY * -0.01));
+    }
+
+    window.addEventListener('wheel', handleWheel);
+
     return () => {
       window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener('wheel', handleWheel);
       document.body.removeChild(canvas);
     };
-  }, []);
+  }, [zoom]);
 
   return null;
 }

@@ -21,3 +21,7 @@ To run this application, follow these steps:
    ```
 
 3. Open your browser and navigate to `http://localhost:3000` to view the demo.
+
+## Zoom Functionality
+
+You can zoom in and out of the fractal using the mouse wheel. Scroll up to zoom in and scroll down to zoom out.
