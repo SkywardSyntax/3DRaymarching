@@ -262,44 +262,56 @@ function Home() {
     window.addEventListener('touchstart', handleTouchStart);
     window.addEventListener('touchmove', handleTouchMove);
 
-    // Handle mouse events for rotation
-    function handleMouseDown(event) {
-      setIsDragging(true);
-      setLastMouseX(event.clientX);
-      setLastMouseY(event.clientY);
-    }
+    // Remove mouse events for rotation
+    // function handleMouseDown(event) {
+    //   setIsDragging(true);
+    //   setLastMouseX(event.clientX);
+    //   setLastMouseY(event.clientY);
+    // }
 
-    function handleMouseMove(event) {
-      if (isDragging) {
-        const deltaX = event.clientX - lastMouseX;
-        const deltaY = event.clientY - lastMouseY;
-        setRotationX(rotationX + deltaY * 0.01);
-        setRotationY(rotationY + deltaX * 0.01);
-        setLastMouseX(event.clientX);
-        setLastMouseY(event.clientY);
-      }
-    }
+    // function handleMouseMove(event) {
+    //   if (isDragging) {
+    //     const deltaX = event.clientX - lastMouseX;
+    //     const deltaY = event.clientY - lastMouseY;
+    //     setRotationX(rotationX + deltaY * 0.01);
+    //     setRotationY(rotationY + deltaX * 0.01);
+    //     setLastMouseX(event.clientX);
+    //     setLastMouseY(event.clientY);
+    //   }
+    // }
 
-    function handleMouseUp() {
-      setIsDragging(false);
-    }
+    // function handleMouseUp() {
+    //   setIsDragging(false);
+    // }
 
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    // window.addEventListener('mousedown', handleMouseDown);
+    // window.addEventListener('mousemove', handleMouseMove);
+    // window.addEventListener('mouseup', handleMouseUp);
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      // window.removeEventListener('mousedown', handleMouseDown);
+      // window.removeEventListener('mousemove', handleMouseMove);
+      // window.removeEventListener('mouseup', handleMouseUp);
       document.body.removeChild(canvas);
     };
   }, [zoom, rotationX, rotationY]);
 
-  return null;
+  return (
+    <div className="frosted-glass-chip">
+      <input
+        type="range"
+        min={-Math.PI}
+        max={Math.PI}
+        step={0.01}
+        value={rotationY}
+        onChange={(e) => setRotationY(parseFloat(e.target.value))}
+        className="slider"
+      />
+    </div>
+  );
 }
 
 export default Home;
