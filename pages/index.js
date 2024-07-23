@@ -3,6 +3,11 @@ import { mat4 } from 'gl-matrix';
 
 function Home() {
   const [zoom, setZoom] = useState(1.0);
+  const [rotationX, setRotationX] = useState(0);
+  const [rotationY, setRotationY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [lastMouseX, setLastMouseX] = useState(0);
+  const [lastMouseY, setLastMouseY] = useState(0);
 
   useEffect(() => {
     const canvas = document.createElement('canvas');
@@ -29,6 +34,7 @@ function Home() {
       uniform float u_time;
       uniform float u_zoom;
       uniform vec3 u_lightPos;
+      uniform mat4 u_rotation;
 
       float sphere(vec3 p) {
         return length(p) - 1.0;
@@ -103,6 +109,9 @@ function Home() {
         vec3 ro = vec3(0.0, 0.0, 5.0 / u_zoom); // Ray origin
         vec3 rd = normalize(vec3(uv, -1.0)); // Ray direction
 
+        // Apply rotation to ray direction
+        rd = (u_rotation * vec4(rd, 0.0)).xyz;
+
         float t = rayMarching(ro, rd);
         vec3 pos = ro + t * rd;
 
@@ -154,6 +163,7 @@ function Home() {
     const timeLocation = gl.getUniformLocation(program, 'u_time');
     const zoomLocation = gl.getUniformLocation(program, 'u_zoom');
     const lightPosLocation = gl.getUniformLocation(program, 'u_lightPos');
+    const rotationLocation = gl.getUniformLocation(program, 'u_rotation');
 
     if (positionLocation === -1) {
       console.error('Unable to get attribute location for a_position');
@@ -180,6 +190,12 @@ function Home() {
       gl.uniform1f(timeLocation, time);
       gl.uniform1f(zoomLocation, zoom);
       gl.uniform3f(lightPosLocation, 2.0, 2.0, 2.0);
+
+      // Create rotation matrix
+      const rotationMatrix = mat4.create();
+      mat4.rotateX(rotationMatrix, rotationMatrix, rotationX);
+      mat4.rotateY(rotationMatrix, rotationMatrix, rotationY);
+      gl.uniformMatrix4fv(rotationLocation, false, rotationMatrix);
 
       // Clear the canvas with a specific color
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -229,13 +245,42 @@ function Home() {
     window.addEventListener('touchstart', handleTouchStart);
     window.addEventListener('touchmove', handleTouchMove);
 
+    // Handle mouse events for rotation
+    function handleMouseDown(event) {
+      setIsDragging(true);
+      setLastMouseX(event.clientX);
+      setLastMouseY(event.clientY);
+    }
+
+    function handleMouseMove(event) {
+      if (isDragging) {
+        const deltaX = event.clientX - lastMouseX;
+        const deltaY = event.clientY - lastMouseY;
+        setRotationX(rotationX + deltaY * 0.01);
+        setRotationY(rotationY + deltaX * 0.01);
+        setLastMouseX(event.clientX);
+        setLastMouseY(event.clientY);
+      }
+    }
+
+    function handleMouseUp() {
+      setIsDragging(false);
+    }
+
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
     return () => {
       window.removeEventListener('resize', resizeCanvas);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
       document.body.removeChild(canvas);
     };
-  }, [zoom]);
+  }, [zoom, rotationX, rotationY]);
 
   return null;
 }
