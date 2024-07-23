@@ -50,6 +50,33 @@ function Home() {
         return res;
       }
 
+      float softShadow(vec3 ro, vec3 rd) {
+        float res = 1.0;
+        float t = 0.01;
+        for (int i = 0; i < 50; i++) {
+          vec3 p = ro + t * rd;
+          float d = sphere(p);
+          if (d < 0.001) {
+            res = 0.0;
+            break;
+          }
+          res = min(res, 10.0 * d / t);
+          t += d;
+        }
+        return res;
+      }
+
+      float ambientOcclusion(vec3 p, vec3 n) {
+        float occlusion = 0.0;
+        float scale = 1.0;
+        for (int i = 1; i <= 5; i++) {
+          float dist = float(i) * 0.1;
+          occlusion += (dist - sphere(p + n * dist)) * scale;
+          scale *= 0.5;
+        }
+        return 1.0 - occlusion;
+      }
+
       float rayMarching(vec3 ro, vec3 rd) {
         float t = 0.0;
         for (int i = 0; i < 100; i++) {
@@ -80,9 +107,10 @@ function Home() {
         vec3 pos = ro + t * rd;
 
         vec3 lightDir = normalize(u_lightPos - pos);
-        float shadow = calculateShadow(pos + lightDir * 0.01, lightDir);
+        float shadow = softShadow(pos + lightDir * 0.01, lightDir);
+        float ao = ambientOcclusion(pos, lightDir);
 
-        vec3 color = vec3(1.0 - t / 10.0, 0.5 * sin(u_time + t), 1.0) * shadow;
+        vec3 color = vec3(1.0 - t / 10.0, 0.5 * sin(u_time + t), 1.0) * shadow * ao;
 
         gl_FragColor = vec4(color, 1.0);
 
