@@ -30,10 +30,12 @@ function Home() {
       float fractal(vec3 p) {
         float scale = 1.0;
         float dist = 0.0;
-        for (int i = 0; i < 8; i++) {
+        int i = 0;
+        while (i < 8) {
           p.xy = abs(p.xy) / dot(p.xy, p.xy) - 1.0;
           dist += length(p) * scale;
           scale *= 0.5;
+          i++;
         }
         return dist;
       }
@@ -49,7 +51,7 @@ function Home() {
         float totalDistance = 0.0; // Total distance traveled by the ray
         float minDistance = 0.001; // Minimum distance to consider as hitting the surface
         float maxDistance = 100.0; // Maximum distance before giving up
-        int maxSteps = 64; // Maximum number of steps
+        const int maxSteps = 64; // Maximum number of steps
 
         for (int i = 0; i < maxSteps; i++) {
           vec3 pos = ro + totalDistance * rd;
