@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { mat4, vec3 } from 'gl-matrix';
 import debounce from 'lodash.debounce';
+import { render } from 'solid-js/web';
+import DialogBox from '../components/DialogBox';
 
 function Home() {
   const [zoom, setZoom] = useState(1.0);
@@ -365,11 +367,25 @@ function Home() {
     };
   }, [zoom, rotationX, rotationY, roughness]);
 
+  useEffect(() => {
+    const isFirstTimeUser = localStorage.getItem('isFirstTimeUser');
+    if (isFirstTimeUser === null) {
+      localStorage.setItem('isFirstTimeUser', 'true');
+    }
+  }, []);
+
   return (
     <div className="frosted-glass-chip">
+      {localStorage.getItem('isFirstTimeUser') === 'true' && (
+        <div id="dialog-box-container"></div>
+      )}
       {/* Removed rotation slider input */}
     </div>
   );
+}
+
+if (typeof window !== 'undefined') {
+  render(() => <DialogBox />, document.getElementById('dialog-box-container'));
 }
 
 export default Home;
