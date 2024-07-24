@@ -97,14 +97,15 @@ function Home() {
       float softShadow(vec3 ro, vec3 rd) {
         float res = 1.0;
         float t = 0.01;
-        for (int i = 0; i < 25; i++) {
+        float k = 16.0; // Smoothing factor
+        for (int i = 0; i < 50; i++) {
           vec3 p = ro + t * rd;
           float d = sphere(p);
           if (d < 0.001) {
             res = 0.0;
             break;
           }
-          res = min(res, 10.0 * d / t);
+          res = min(res, k * d / t);
           t += d;
         }
         return res;

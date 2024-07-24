@@ -39,3 +39,7 @@ You can now modify the magnitude of the roughness of the sphere using the up and
 ## Dynamic Light Source Movement
 
 The light source now moves around the sphere, and the sphere's lighting updates live. The light source position changes dynamically over time, creating a more interactive and visually appealing experience.
+
+## Edge Smoothing Algorithms
+
+The shadow and sphere rendering algorithms have been updated to use more complex techniques for smoothing edges. This results in smoother and more realistic visuals for both shadows and the sphere.
