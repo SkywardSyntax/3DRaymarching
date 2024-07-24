@@ -368,15 +368,17 @@ function Home() {
   }, [zoom, rotationX, rotationY, roughness]);
 
   useEffect(() => {
-    const isFirstTimeUser = localStorage.getItem('isFirstTimeUser');
-    if (isFirstTimeUser === null) {
-      localStorage.setItem('isFirstTimeUser', 'true');
+    if (typeof localStorage !== 'undefined') {
+      const isFirstTimeUser = localStorage.getItem('isFirstTimeUser');
+      if (isFirstTimeUser === null) {
+        localStorage.setItem('isFirstTimeUser', 'true');
+      }
     }
   }, []);
 
   return (
     <div className="frosted-glass-chip">
-      {localStorage.getItem('isFirstTimeUser') === 'true' && (
+      {typeof localStorage !== 'undefined' && localStorage.getItem('isFirstTimeUser') === 'true' && (
         <div id="dialog-box-container"></div>
       )}
       {/* Removed rotation slider input */}
@@ -385,7 +387,10 @@ function Home() {
 }
 
 if (typeof window !== 'undefined') {
-  render(() => <DialogBox />, document.getElementById('dialog-box-container'));
+  const dialogBoxContainer = document.getElementById('dialog-box-container');
+  if (dialogBoxContainer) {
+    render(() => <DialogBox />, dialogBoxContainer);
+  }
 }
 
 export default Home;

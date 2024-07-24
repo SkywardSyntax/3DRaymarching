@@ -5,13 +5,17 @@ function DialogBox() {
 
   const handleClose = () => {
     setIsVisible(false);
-    localStorage.setItem('isFirstTimeUser', 'false');
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('isFirstTimeUser', 'false');
+    }
   };
 
   onMount(() => {
-    const isFirstTimeUser = localStorage.getItem('isFirstTimeUser');
-    if (isFirstTimeUser === 'false') {
-      setIsVisible(false);
+    if (typeof localStorage !== 'undefined') {
+      const isFirstTimeUser = localStorage.getItem('isFirstTimeUser');
+      if (isFirstTimeUser === 'false') {
+        setIsVisible(false);
+      }
     }
   });
 
