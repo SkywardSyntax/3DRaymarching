@@ -43,3 +43,7 @@ The light source now moves around the sphere, and the sphere's lighting updates 
 ## Edge Smoothing Algorithms
 
 The shadow and sphere rendering algorithms have been updated to use more complex techniques for smoothing edges. This results in smoother and more realistic visuals for both shadows and the sphere.
+
+## GitHub Actions Workflow
+
+This project includes a GitHub Actions workflow for deploying the site to GitHub Pages. The workflow is defined in the `.github/workflows/nextjs.yml` file.
