@@ -47,3 +47,6 @@ The shadow and sphere rendering algorithms have been updated to use more complex
 ## GitHub Actions Workflow
 
 This project includes a GitHub Actions workflow for deploying the site to GitHub Pages. The workflow is defined in the `.github/workflows/nextjs.yml` file.
+
+## Demo
+![Demo](demo.png)
